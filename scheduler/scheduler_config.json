@@ -1,0 +1,5 @@
+{
+  "times": ["13:51", "18:00"],
+  "mode": "docker",
+  "_comment": "For mode choose between docker/native"
+}

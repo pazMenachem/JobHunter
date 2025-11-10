@@ -1,0 +1,11 @@
+services:
+  jobhunter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jobhunter
+    container_name: jobhunter
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
