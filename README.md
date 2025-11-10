@@ -25,10 +25,13 @@ Run JobHunter directly with Python and a virtual environment.
 **Quick steps:**
 1. Install Python 3.13 or higher
 2. Create virtual environment: `python -m venv venv`
-3. Install JobHunter: `pip install -e .`
-4. Setup `.env` file with API keys
-5. Configure `src/config.py` with your job search criteria
-6. Run: `jh run` (or `python main.py run`)
+3. Activate virtual environment:
+   - Windows: `venv\Scripts\activate`
+   - Linux/Mac: `source venv/bin/activate`
+4. Install JobHunter: `pip install -e .`
+5. Setup `.env` file with API keys
+6. Configure `src/config.py` with your job search criteria
+7. Run: `jh run` (or `python main.py run`)
 
 👉 **[See Installation Guide](INSTALL.md)** for detailed instructions
 

@@ -13,46 +13,6 @@ from src.message_formatter import MessageFormatterService
 from src.exceptions.exceptions import JobCrawlerException, LLMException, NotifierException, NoNewJobsException
 from typing import List
 
-TEST_DATA = [
-    JobData(
-        id="1",
-        title="Data Engineer",
-        company="Copyleaks",
-        url="https://copyleaks.com/careers/data-engineer",
-        source_url="https://copyleaks.com/careers",
-        relevant=RelevanceStatus.YES,
-        reason="Data Engineer"
-    ),
-    JobData(
-        id="2",
-        title="QA AUTOMATION ENGINEER",
-        company="Copyleaks",
-        url="https://copyleaks.com/careers/qa-automation-engineer",
-        source_url="https://copyleaks.com/careers",
-        relevant=RelevanceStatus.MAYBE,
-        reason="QA Automation Engineer"
-    ),
-    JobData(
-        id="3",
-        title="Bookkeeper",
-        company="Copyleaks",
-        url="https://copyleaks.com/careers/bookkeeper",
-        source_url="https://copyleaks.com/careers",
-        relevant=RelevanceStatus.NO,
-        reason="Bookkeeper"
-    ),
-]
-
-TEST_DATA_TWO = [ JobData(
-        id=f"{i}",
-        title=f"Data Engineer {i}",
-        company=f"Company {i}",
-        url=f"https://company{i}.com/careers/data-engineer",
-        source_url=f"https://company{i}.com/careers",
-        relevant=RelevanceStatus.YES,
-        reason="Unknown"
-    ) for i in range(1, 171) ]
-
 
 class JobHunterOrchestrator:
     """Orchestrates the complete JobHunter application workflow.
@@ -99,14 +59,14 @@ class JobHunterOrchestrator:
             self.logger.info("\n\t\t********* Starting to run *********\n")
             
             # Step 1: Crawl jobs
-            # self._crawl_jobs()
+            self._crawl_jobs()
             
-            self.jobs = TEST_DATA_TWO
             # Step 2: Filter duplicate jobs
             self._filter_duplicate_jobs()
 
             # Step 3: Update job status using LLM
-            # self._update_job_status()
+            self._update_job_status()
+            
             # Step 4: Filter jobs based on relevance
             self._filter_jobs_by_relevance()
             
