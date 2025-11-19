@@ -1,14 +1,14 @@
 """Application orchestrator for coordinating all components."""
 
 from src.logger import get_logger
-from src.config import scraping_settings, llm_settings, NOTIFIER_PROVIDER_NAMES
+from src.config import llm_settings, NOTIFIER_PROVIDER_NAMES
 from src.job_crawler_service.job_crawler_service import JobCrawlerService
 from src.job_storage.job_storage_service import JobStorageService
 from src.llm_service.factory import LLMProviderFactory
 from src.llm_service.llm_service import LLMService
 from src.job_filter.job_filter import JobFilter
 from src.notification_service.notifier_service import NotifierService
-from src.data_models import JobData, RunSummary, RelevanceStatus, SegmentedMessage
+from src.data_models import JobData, RunSummary, SegmentedMessage
 from src.message_formatter import MessageFormatterService
 from src.exceptions.exceptions import JobCrawlerException, LLMException, NotifierException, NoNewJobsException
 from typing import List

@@ -69,52 +69,33 @@ Create a `.env` file in the project root directory. You can use `.env.example` a
 copy .env.example .env
 ```
 
-**Then edit `.env` and add your actual API keys:**
+**📖 For detailed instructions on setting up all environment variables, see:**
+
+👉 **[Environment Setup Guide](ENVIRONMENT_SETUP.md)**
+
+This guide covers:
+- ✅ **LLM API Key** (Google Gemini) - Required
+- ✅ **Telegram Notifications** - How to create a bot and get chat ID
+- ✅ **Email Notifications** - Gmail, Outlook, Yahoo, and custom SMTP servers
+- ✅ **Troubleshooting** - Common issues and solutions
+
+**Quick reference for minimum required variables:**
 
 ```env
+# Required
 LLM_API_KEY=your_gemini_api_key_here
+
+# At least one notification provider required:
 TELEGRAM_API_TOKEN=your_telegram_bot_token
 TELEGRAM_API_CHAT_ID=your_telegram_chat_id
+
+# OR use email notifications:
+MAIL_SENDER_EMAIL=your-email@gmail.com
+MAIL_APP_PASSWORD=your-app-password
+MAIL_RECIPIENT_EMAIL=recipient@example.com
+MAIL_SMTP_SERVER=smtp.gmail.com
+MAIL_SMTP_PORT=587
 ```
-
-**How to get these values:**
-
-#### LLM_API_KEY (Google Gemini API Key)
-
-1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click **"Get API Key"** or **"Create API Key"**
-4. Select or create a Google Cloud project (if prompted)
-5. Copy the generated API key
-6. Paste it into your `.env` file as `LLM_API_KEY=your_copied_key_here`
-
-**Note:** Keep this key secure and never commit it to version control.
-
-#### TELEGRAM_API_TOKEN (Telegram Bot Token)
-
-1. Open Telegram and search for [@BotFather](https://t.me/botfather)
-2. Start a conversation with BotFather
-3. Send the command `/newbot`
-4. Follow the prompts:
-   - Choose a name for your bot (e.g., "JobHunter Bot")
-   - Choose a username for your bot (must end with "bot", e.g., "my_jobhunter_bot")
-5. BotFather will send you a token that looks like: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`
-6. Copy this token and paste it into your `.env` file as `TELEGRAM_API_TOKEN=your_copied_token_here`
-
-**Note:** This token allows the bot to send messages. Keep it secure.
-
-#### TELEGRAM_API_CHAT_ID (Your Telegram Chat ID)
-
-1. Open Telegram and search for [@userinfobot](https://t.me/userinfobot) or [@getidsbot](https://t.me/getidsbot)
-2. Start a conversation with the bot
-3. The bot will immediately reply with your chat ID (a number like `123456789`)
-4. Copy this number and paste it into your `.env` file as `TELEGRAM_API_CHAT_ID=your_chat_id_here`
-
-**Alternative method:**
-- If the bots don't work, you can also message your bot (the one you created above) and then visit: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
-- Look for the `"chat":{"id":` field in the response
-
-**Note:** This ID tells the bot where to send notifications (your personal chat).
 
 ### 7. Configure Application Settings
 
@@ -191,13 +172,20 @@ TARGET_URLS = [
 
 #### Notification Providers (Line 36)
 
-Currently set to Telegram. You can modify this if other providers are added:
+Choose which notification providers to use. Available options: `"telegram"`, `"mail"`
 
 ```python
+# Use Telegram only
 NOTIFIER_PROVIDER_NAMES = ["telegram"]
+
+# Use email only
+NOTIFIER_PROVIDER_NAMES = ["mail"]
+
+# Use both
+NOTIFIER_PROVIDER_NAMES = ["telegram", "mail"]
 ```
 
-**Note:** You can easily add another notification provider by implementing the provider abstract class. The same applies to LLM providers - you can add new LLM providers by implementing the LLM provider abstract class. See the existing provider implementations in `src/notification_service/` and `src/llm_service/` for reference.
+**Note:** Make sure the corresponding environment variables are set in `.env` for the providers you enable. See [Environment Setup Guide](ENVIRONMENT_SETUP.md) for details on configuring each provider.
 
 #### LLM Analysis Prompt (Lines 38-80)
 
@@ -336,58 +324,39 @@ pip install -r requirements.txt
 
 ### 6. Setup Environment Variables
 
-Create a `.env` file in the project root directory. You can use `.env.example` as a template:
+Create a `.env` file in the project root directory:
 
 ```bash
-cp .env.example .env
+touch .env
 ```
 
-**Then edit `.env` and add your actual API keys:**
+**📖 For detailed instructions on setting up all environment variables, see:**
+
+👉 **[Environment Setup Guide](ENVIRONMENT_SETUP.md)**
+
+This guide covers:
+- ✅ **LLM API Key** (Google Gemini) - Required
+- ✅ **Telegram Notifications** - How to create a bot and get chat ID
+- ✅ **Email Notifications** - Gmail, Outlook, Yahoo, and custom SMTP servers
+- ✅ **Troubleshooting** - Common issues and solutions
+
+**Quick reference for minimum required variables:**
 
 ```env
+# Required
 LLM_API_KEY=your_gemini_api_key_here
+
+# At least one notification provider required:
 TELEGRAM_API_TOKEN=your_telegram_bot_token
 TELEGRAM_API_CHAT_ID=your_telegram_chat_id
+
+# OR use email notifications:
+MAIL_SENDER_EMAIL=your-email@gmail.com
+MAIL_APP_PASSWORD=your-app-password
+MAIL_RECIPIENT_EMAIL=recipient@example.com
+MAIL_SMTP_SERVER=smtp.gmail.com
+MAIL_SMTP_PORT=587
 ```
-
-**How to get these values:**
-
-#### LLM_API_KEY (Google Gemini API Key)
-
-1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click **"Get API Key"** or **"Create API Key"**
-4. Select or create a Google Cloud project (if prompted)
-5. Copy the generated API key
-6. Paste it into your `.env` file as `LLM_API_KEY=your_copied_key_here`
-
-**Note:** Keep this key secure and never commit it to version control.
-
-#### TELEGRAM_API_TOKEN (Telegram Bot Token)
-
-1. Open Telegram and search for [@BotFather](https://t.me/botfather)
-2. Start a conversation with BotFather
-3. Send the command `/newbot`
-4. Follow the prompts:
-   - Choose a name for your bot (e.g., "JobHunter Bot")
-   - Choose a username for your bot (must end with "bot", e.g., "my_jobhunter_bot")
-5. BotFather will send you a token that looks like: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`
-6. Copy this token and paste it into your `.env` file as `TELEGRAM_API_TOKEN=your_copied_token_here`
-
-**Note:** This token allows the bot to send messages. Keep it secure.
-
-#### TELEGRAM_API_CHAT_ID (Your Telegram Chat ID)
-
-1. Open Telegram and search for [@userinfobot](https://t.me/userinfobot) or [@getidsbot](https://t.me/getidsbot)
-2. Start a conversation with the bot
-3. The bot will immediately reply with your chat ID (a number like `123456789`)
-4. Copy this number and paste it into your `.env` file as `TELEGRAM_API_CHAT_ID=your_chat_id_here`
-
-**Alternative method:**
-- If the bots don't work, you can also message your bot (the one you created above) and then visit: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
-- Look for the `"chat":{"id":` field in the response
-
-**Note:** This ID tells the bot where to send notifications (your personal chat).
 
 ### 7. Test the Application
 
