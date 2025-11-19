@@ -33,7 +33,7 @@ TARGET_URLS = [
     "https://copyleaks.com/careers",
 ]
 
-NOTIFIER_PROVIDER_NAMES = ["telegram"]
+NOTIFIER_PROVIDER_NAMES = ["mail"]
 
 DEFAULT_BASE_PROMPT = """
 You are a job relevance analyzer for computer science graduates. Analyze each job posting(url, title, company, description) and determine relevance.
@@ -213,17 +213,40 @@ class TelegramSettings:
             self.bot_token and self.chat_id
             )
 
-class GmailSettings:
-    """Gmail notification settings for the job scraper application."""
+class MailSettings:
+    """Mail notification settings for the job scraper application."""
     
-    def __init__(self, max_message_length: int = 1000000) -> None:
-        """Initialize the Gmail settings.
+    def __init__(
+        self,
+        sender_email: str = None,
+        sender_password: str = None,
+        recipient_email: str = None,
+        smtp_server: str = None,
+        smtp_port: int = 587,
+        max_message_length: int = 1000000
+    ) -> None:
+        """Initialize the mail settings.
         
         Args:
-            max_message_length: Maximum message length for Gmail (default: 1000000)
+            sender_email: Email address for sending
+            sender_password: Email password or app password for authentication
+            recipient_email: Email address to receive notifications
+            smtp_server: SMTP server address (e.g., smtp.gmail.com)
+            smtp_port: SMTP server port (default: 587 for TLS)
+            max_message_length: Maximum message length (default: 1000000)
         """
+        self.sender_email = sender_email
+        self.sender_password = sender_password
+        self.recipient_email = recipient_email
+        self.smtp_server = smtp_server
+        self.smtp_port = smtp_port
         self.max_message_length = max_message_length
-        self.enabled = False
+        self.enabled = bool(
+            self.sender_email and
+            self.sender_password and
+            self.recipient_email and
+            self.smtp_server
+        )
 
 class JobStorageSettings:
     """Job storage settings for the job scraper application."""
@@ -266,6 +289,12 @@ telegram_settings = TelegramSettings(
     chat_id=os.getenv("TELEGRAM_API_CHAT_ID", None)
     )
 
-gmail_settings = GmailSettings()
+mail_settings = MailSettings(
+    sender_email=os.getenv("MAIL_SENDER_EMAIL", None),
+    sender_password=os.getenv("MAIL_APP_PASSWORD", None),
+    recipient_email=os.getenv("MAIL_RECIPIENT_EMAIL", None),
+    smtp_server=os.getenv("MAIL_SMTP_SERVER", None),
+    smtp_port=int(os.getenv("MAIL_SMTP_PORT", "587"))
+)
 
 job_storage_settings = JobStorageSettings()

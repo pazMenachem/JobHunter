@@ -1,19 +1,30 @@
 """Application orchestrator for coordinating all components."""
 
 from src.logger import get_logger
-from src.config import scraping_settings, llm_settings, NOTIFIER_PROVIDER_NAMES
+from src.config import llm_settings, NOTIFIER_PROVIDER_NAMES
 from src.job_crawler_service.job_crawler_service import JobCrawlerService
 from src.job_storage.job_storage_service import JobStorageService
 from src.llm_service.factory import LLMProviderFactory
 from src.llm_service.llm_service import LLMService
 from src.job_filter.job_filter import JobFilter
 from src.notification_service.notifier_service import NotifierService
-from src.data_models import JobData, RunSummary, RelevanceStatus, SegmentedMessage
+from src.data_models import JobData, RunSummary, SegmentedMessage
 from src.message_formatter import MessageFormatterService
 from src.exceptions.exceptions import JobCrawlerException, LLMException, NotifierException, NoNewJobsException
 from typing import List
 
 
+TEST_JOBS = [
+    JobData(
+    id=str(i), 
+    title=f"Job {i}", 
+    company=f"Company {i}", 
+    url=f"https://example.com/job/{i}", 
+    source_url=f"https://example.com/source/{i}",
+    reason=f"Job {i} is relevant because it is a job"
+    ) 
+    for i in range(10)
+    ]
 class JobHunterOrchestrator:
     """Orchestrates the complete JobHunter application workflow.
     
@@ -59,16 +70,17 @@ class JobHunterOrchestrator:
             self.logger.info("\n\t\t********* Starting to run *********\n")
             
             # Step 1: Crawl jobs
-            self._crawl_jobs()
+            # self._crawl_jobs()
             
             # Step 2: Filter duplicate jobs
-            self._filter_duplicate_jobs()
+            # self._filter_duplicate_jobs()
 
             # Step 3: Update job status using LLM
-            self._update_job_status()
+            # self._update_job_status()
             
             # Step 4: Filter jobs based on relevance
-            self._filter_jobs_by_relevance()
+            # self._filter_jobs_by_relevance()
+            self.run_summary.jobs = TEST_JOBS
             
             # Step 5: Send summary to user
             self._send_summary(run_summary=self.run_summary)
