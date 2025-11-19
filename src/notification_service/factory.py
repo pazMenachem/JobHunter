@@ -2,8 +2,8 @@
 
 from src.notification_service.notifier_interface import NotifierInterface
 from src.notification_service.telegram_provider import TelegramProvider
-from src.notification_service.gmail_provider import GmailProvider
-from src.config import telegram_settings, gmail_settings
+from src.notification_service.gmail_provider import MailProvider
+from src.config import telegram_settings, mail_settings
 
 class NotifierFactory:
     """Factory class for creating notifier providers based on configuration."""
@@ -14,8 +14,8 @@ class NotifierFactory:
         Create and return the appropriate notifier provider based on configuration.
         """
         match provider_type.lower():
-            case "gmail":
-                raise NotImplementedError("Gmail notifications are not implemented yet")
+            case "mail":
+                return NotifierFactory._create_mail_provider()
             case "telegram":
                 return NotifierFactory._create_telegram_provider()
             case _:
@@ -31,7 +31,17 @@ class NotifierFactory:
                 max_message_length=telegram_settings.max_message_length
                 )
         raise ValueError("Telegram notifications are not enabled")
+    
     @staticmethod
-    def _create_gmail_provider() -> GmailProvider:
-        """Create a Gmail provider instance."""
-        pass
+    def _create_mail_provider() -> MailProvider:
+        """Create a mail provider instance."""
+        if mail_settings.enabled:
+            return MailProvider(
+                sender_email=mail_settings.sender_email,
+                sender_password=mail_settings.sender_password,
+                recipient_email=mail_settings.recipient_email,
+                smtp_server=mail_settings.smtp_server,
+                smtp_port=mail_settings.smtp_port,
+                max_message_length=mail_settings.max_message_length
+            )
+        raise ValueError("Mail notifications are not enabled - check .env configuration")

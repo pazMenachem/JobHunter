@@ -6,7 +6,7 @@ Automated job search and filtering application that crawls job listings, analyze
 
 - 🔍 **Automated Job Crawling** - Scrapes job listings from company career pages
 - 🤖 **AI-Powered Filtering** - Uses LLM (Gemini) to analyze job relevance based on your criteria
-- 📱 **Smart Notifications** - Sends filtered job opportunities via Telegram
+- 📱 **Smart Notifications** - Sends filtered job opportunities via Telegram or Email
 - 💾 **Job Storage** - Tracks sent jobs to avoid duplicates
 - ⏰ **Scheduled Runs** - Automatically runs at specified times
 - 🐳 **Docker Support** - Run in containers for consistent environments
@@ -82,12 +82,23 @@ Use native schedulers (cron or systemd):
 Create a `.env` file in the project root:
 
 ```env
+# Required
 LLM_API_KEY=your_gemini_api_key_here
+
+# Choose at least one notification provider:
+# Telegram:
 TELEGRAM_API_TOKEN=your_telegram_bot_token
 TELEGRAM_API_CHAT_ID=your_telegram_chat_id
+
+# Email (Gmail, Outlook, Yahoo, or any SMTP):
+MAIL_SENDER_EMAIL=your-email@gmail.com
+MAIL_APP_PASSWORD=your-app-password
+MAIL_RECIPIENT_EMAIL=recipient@example.com
+MAIL_SMTP_SERVER=smtp.gmail.com
+MAIL_SMTP_PORT=587
 ```
 
-👉 See setup guides for detailed instructions on obtaining these values.
+👉 See [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md) for detailed instructions on obtaining these values.
 
 ### Application Settings
 
@@ -133,12 +144,14 @@ JobHunter/
 - **Docker** (optional): For containerized execution
 - **API Keys**:
   - Google Gemini API key (for LLM analysis)
-  - Telegram Bot Token and Chat ID (for notifications)
+  - Telegram Bot Token and Chat ID (for Telegram notifications) OR
+  - Email credentials for SMTP (for email notifications)
 
 ## Documentation
 
 📚 **[View All Documentation](docs/)** - Complete documentation index
 
+- **[Environment Setup Guide](docs/ENVIRONMENT_SETUP.md)** - How to configure API keys and notifications
 - **[Native Python Setup Guide](docs/SETUP_NATIVE.md)** - Complete setup instructions for Python venv
 - **[Docker Setup Guide](docs/SETUP_DOCKER.md)** - Complete setup instructions for Docker
 - **[Linux Scheduler Guide](docs/LINUX_SCHEDULER.md)** - Cron and systemd scheduling examples
