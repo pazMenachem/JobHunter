@@ -48,7 +48,7 @@ class MessageFormatterService:
             for i, job in enumerate(jobs)
         ])
 
-        message_result = f"""{base_prompt}\nsource url: {jobs[0].source_url}\nJobs to analyze:\n\n{jobs_text}"""
+        message_result = f"""{base_prompt}\nJobs to analyze:\n\n{jobs_text}"""
 
         return message_result
 

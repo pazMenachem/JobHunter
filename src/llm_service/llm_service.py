@@ -50,6 +50,11 @@ class LLMService:
                 
                 prompt = MessageFormatterService.format_llm_prompt(batch)
                 response = self.llm_provider.send_to_llm(prompt)
+                
+                if not response:
+                    self.logger.error(f"Empty response from LLM, skipping batch {batch_num}")
+                    continue
+
                 json_data = self._clean_json_response(response)
                 self._parse_batch_response(json_data, batch)
                 

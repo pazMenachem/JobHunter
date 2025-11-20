@@ -15,7 +15,7 @@ DEFAULT_KEYWORDS = [
     "engineer",
     "graduate",
     "junior",
-    "software engineer",
+    "software",
 ]
 
 EXCLUDED_KEYWORDS = [
@@ -25,15 +25,34 @@ EXCLUDED_KEYWORDS = [
     "hr",
     "finance",
     "operations",
+    "lead",
+    "manager",
+    "director",
+    "CTO",
+    "CEO",
+    "CFO",
+    "CMO",
+    "CIO",
+    "COO",
+    "VP",
+    "head",
+    "chip",
+    "electrical",
+    "sr.",
 ]
 
 # URLs to scrape (add your target job sites here)
 TARGET_URLS = [
     "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite?locationHierarchy1=2fcb99c455831013ea52bbe14cf9326c&jobFamilyGroup=0c40f6bd1d8f10ae43ffaefd46dc7e78&workerSubType=0c40f6bd1d8f10adf6dae161b1844a15&workerSubType=ab40a98049581037a3ada55b087049b7&timeType=5509c0b5959810ac0029943377d47364",
     "https://copyleaks.com/careers",
+    "https://redhat.wd5.myworkdayjobs.com/jobs/?a=084562884af243748dad7c84c304d89a&e=3afab13eadf301a2eaafadcc15425800",
+    "https://careers.checkpoint.com/index.php?q=&module=cpcareers&a=search&fa%5B%5D=department_s%3AR%26D&fa%5B%5D=country_ss%3AIsrael&sort=date_published_display_s+desc",
+    "https://monday.com/careers?department=rnd&location=telaviv",
+    "https://www.playtika.com/careers/research-development",
+    "https://autodesk.wd1.myworkdayjobs.com/en-US/Ext/job/Tel-Aviv-ISR/Sr-Fullstack-Engineer--FE-Oriented_25WD92356-1?locationCountry=084562884af243748dad7c84c304d89a&timeType=6d5ece62cf5a4f9f9e349b55f045b5e2&jobFamilyGroup=1f75c4299c9201c0f3b5f8e6fa01c5bf",
 ]
 
-NOTIFIER_PROVIDER_NAMES = ["mail"]
+NOTIFIER_PROVIDER_NAMES = ["telegram"]
 
 DEFAULT_BASE_PROMPT = """
 You are a job relevance analyzer for computer science graduates. Analyze each job posting(url, title, company, description) and determine relevance.
@@ -55,9 +74,8 @@ Analyze the FULL job description content, not just the title. Look for:
    - Code review, testing, quality assurance
 
 3. EXPERIENCE LEVEL INDICATORS:
-   - "0-1 years", "entry-level", "junior", "graduate", "trainee" = YES
-   - "2+ years", "experienced" = MAYBE
-   - "0 years", "no experience required" = YES
+   - "entry-level", "junior", "graduate", "trainee" = YES
+   - "0-2 years", "experienced" = MAYBE
 
 4. INDUSTRY & DOMAIN:
    - Technology companies, startups, software firms
@@ -65,10 +83,13 @@ Analyze the FULL job description content, not just the title. Look for:
    - Data science, AI/ML companies
    - Non-tech companies with technical roles
 
+5. LOCATION:
+   - Israel
+
 RELEVANCE RULES:
-- YES: Technical role + (junior/entry-level OR 0-1 years experience)
-- MAYBE: Technical role + (2+ years experience)
-- NO: Non-technical roles (sales, marketing, HR, finance, operations)
+- YES: Programmer/developer role with 0 - 1 years experience(junior/entry-level OR 0-1 years experience)
+- MAYBE: Programmer/developer role with 1 - 2 years experience
+- NO: Non-programmer roles or 2+ years experience(sales, marketing, HR, finance, etc.)
 
 OUTPUT FORMAT:
 Return JSON array with this exact structure:

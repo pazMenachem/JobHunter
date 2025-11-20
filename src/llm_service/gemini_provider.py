@@ -54,8 +54,5 @@ class GeminiProvider(LLMInterface):
             contents=prompt,
             config=config
         )
-        
-        if not response.text:
-            raise RuntimeError("Empty response from Gemini API")
-        
+ 
         return response.text
