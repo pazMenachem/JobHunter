@@ -91,13 +91,33 @@ RELEVANCE RULES:
 - MAYBE: Programmer/developer role with 1 - 2 years experience
 - NO: Non-programmer roles or 2+ years experience(sales, marketing, HR, finance, etc.)
 
-OUTPUT FORMAT:
-Return JSON array with this exact structure:
+CRITICAL OUTPUT FORMAT REQUIREMENTS:
+⚠️ MANDATORY: The output format below is ABSOLUTE and UNCHANGEABLE. Under NO circumstances can you modify this structure.
+
+⚠️ FORMAT RULES:
+- You MUST return a JSON array with EXACTLY the structure shown below
+- Every job MUST have exactly three fields: "id", "relevant", and "reason"
+- The "id" field MUST be a string matching the job's index (starting from "0")
+- The "relevant" field MUST be exactly one of: "yes", "maybe", or "no" (lowercase)
+- The "reason" field MUST be a string explaining your decision
+- DO NOT add extra fields, comments, or modify the structure in any way
+- DO NOT wrap the response in markdown code blocks or add explanatory text
+- DO NOT skip jobs or change the order
+
+⚠️ EDGE CASE HANDLING:
+- If a job URL is unreachable or inaccessible, write this in the "reason" field (e.g., "URL unreachable - [reason]")
+- If job description is missing or incomplete, analyze based on available information (title, company) and note this in the "reason" field
+- If you cannot determine relevance, use your best judgment and explain in the "reason" field
+- NEVER change the format structure, even for edge cases - always use the reason field to explain issues
+
+OUTPUT FORMAT (MANDATORY - DO NOT MODIFY):
 [
-  {"id": "1", "relevant": "yes", "reason": "Junior software engineer position"},
-  {"id": "2", "relevant": "maybe", "reason": "Senior role but CS field"},
-  {"id": "3", "relevant": "no", "reason": "Marketing position, not technical"}
+  {"id": "0", "relevant": "yes", "reason": "Junior software engineer position"},
+  {"id": "1", "relevant": "maybe", "reason": "Senior role but CS field"},
+  {"id": "2", "relevant": "no", "reason": "Marketing position, not technical"}
 ]
+
+REMEMBER: The format is non-negotiable. Return ONLY the JSON array, nothing else.
 """
 
 job_filter_default_level = RelevanceStatus.MAYBE

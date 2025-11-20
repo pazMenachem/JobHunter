@@ -45,8 +45,11 @@ class GeminiProvider(LLMInterface):
         tools = [{"url_context": {}}]
         
         # Configure generation config for URL context
+        # Temperature=0 for more deterministic, focused responses
+        # This helps reduce verbose explanations and focus on JSON output
         config = GenerateContentConfig(
-            tools=tools
+            tools=tools,
+            temperature=0.0
         )
         
         response = self.client.models.generate_content(

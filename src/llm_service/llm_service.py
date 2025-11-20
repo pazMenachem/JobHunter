@@ -94,30 +94,62 @@ class LLMService:
             self.logger.error(f"General error: {e}")
             raise e
 
-    def _clean_json_response(self, response: str) -> dict:
+    def _clean_json_response(self, response: str) -> list:
         """Clean LLM response by removing markdown code blocks and extra text.
+        
+        Extracts JSON array from response, handling cases where LLM adds
+        verbose analysis text before or after the JSON.
         
         Args:
             response: Raw LLM response that may contain markdown formatting
+                     or verbose text before/after JSON
             
         Returns:
-            Cleaned JSON dictionary
+            Cleaned JSON list (array of dictionaries)
         """
-        self.logger.info(f"cleaning response and converting to json object..")
+        self.logger.info("Cleaning response and converting to JSON object...")
 
-        # Remove markdown code blocks
+        # First, try to extract from markdown code blocks
         if "```json" in response:
-            # Extract content between ```json and ```
             start = response.find("```json") + 7
             end = response.rfind("```")
             if end > start:
                 response = response[start:end].strip()
         elif "```" in response:
-            # Handle generic code blocks
             start = response.find("```") + 3
             end = response.rfind("```")
             if end > start:
                 response = response[start:end].strip()
         
-        # Remove any leading/trailing whitespace
-        return json.loads(response.strip())
+        # Try to find JSON array in the response
+        # Look for the first '[' that starts a JSON array
+        json_start = response.find('[')
+        if json_start == -1:
+            self.logger.error("No JSON array found in response")
+            raise ValueError("No JSON array found in LLM response")
+        
+        # Find the matching closing ']' by counting brackets
+        bracket_count = 0
+        json_end = -1
+        for i in range(json_start, len(response)):
+            if response[i] == '[':
+                bracket_count += 1
+            elif response[i] == ']':
+                bracket_count -= 1
+                if bracket_count == 0:
+                    json_end = i + 1
+                    break
+        
+        if json_end == -1:
+            self.logger.error("Could not find matching closing bracket for JSON array")
+            raise ValueError("Invalid JSON array structure in LLM response")
+        
+        # Extract just the JSON array
+        json_str = response[json_start:json_end].strip()
+        
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            self.logger.error(f"Failed to parse extracted JSON: {e}")
+            self.logger.error(f"Extracted JSON string: {json_str[:500]}...")  # Log first 500 chars
+            raise
