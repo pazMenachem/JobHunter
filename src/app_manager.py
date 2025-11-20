@@ -62,19 +62,19 @@ class JobHunterOrchestrator:
             self._crawl_jobs()
             
             # Step 2: Filter duplicate jobs
-            self._filter_duplicate_jobs()
+            # self._filter_duplicate_jobs()
 
             # Step 3: Update job status using LLM
-            self._update_job_status()
+            # self._update_job_status()
             
             # Step 4: Filter jobs based on relevance
-            self._filter_jobs_by_relevance()
+            # self._filter_jobs_by_relevance()
             
             # Step 5: Send summary to user
-            self._send_summary(run_summary=self.run_summary)
+            # self._send_summary(run_summary=self.run_summary)
             
             # Step 6: Mark jobs as sent
-            self._mark_jobs_as_sent()
+            # self._mark_jobs_as_sent()
         
             self.logger.info("\n\t\t********* Application finished successfully *********\n")
             

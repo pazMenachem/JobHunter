@@ -11,6 +11,7 @@ from src.exceptions.exceptions import JobCrawlerException
 
 
 class JobCrawlerService:
+
     """Manages job crawling operations.
 
     This class coordinates the job scraping process, including
@@ -53,6 +54,7 @@ class JobCrawlerService:
         return result
     
     def _process_url(self, url: str) -> List[JobData]:
+
         """
         Process all pages for current URL.
         

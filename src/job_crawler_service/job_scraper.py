@@ -16,26 +16,16 @@ SCROLLABLE_CONTAINERS = [
 
 MAX_SCROLL_ATTEMPTS = 10
 
-# Job title selectors for various job sites
+# Job title selectors - focus on URL patterns (href-based matching)
 JOB_TITLE_SELECTORS = [
-    "h2 a",  # Common for job titles
-    "h3 a",
-    ".job-title a",
-    ".title a",
-    "[data-testid='job-title'] a",
-    
-    # Additional selectors for various job sites
-    "a[href*='job']",  # Links containing 'job' in href
+    # Primary: Links with job-related keywords in URL
+    "a[href*='position']",  # Links containing 'position' in href
     "a[href*='career']",  # Links containing 'career' in href
-    ".job-listing a",  # Job listing links
-    ".career-item a",  # Career item links
-    ".position a",  # Position links
-    
-    # Fallback selectors (less specific)
-    "li a",  # List item links (common for job lists)
-    "div a",  # Div links (fallback)
-    "span a",  # Span links
-    "p a"  # Paragraph links
+    "a[href*='job']",  # Links containing 'job' in href
+    "a[href*='opening']",  # Links containing 'opening' in href
+    "a[href*='vacancy']",  # Links containing 'vacancy' in href
+    "a[href*='opportunity']",  # Links containing 'opportunity' in href
+    "a[href*='role']",  # Links containing 'role' in href
 ]
 
 
@@ -156,6 +146,7 @@ class JobScraper:
                 if href and href not in seen_urls:
                     seen_urls.add(href)
                     unique_elements.append(element)
+                    self.logger.info(f"Added element: {element.inner_text()}")
                 elif href:
                     self.logger.debug(f"Duplicate URL found: {href}")
             except Exception as e:
