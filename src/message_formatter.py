@@ -113,7 +113,7 @@ class MessageFormatterService:
         message_parts = []
         current_part = ""
 
-        for i, job in enumerate(run_summary.jobs, 1):
+        for i, job in enumerate(run_summary.relevant_jobs, 1):
             job_text = (
                 f"\n{i}. {job.title} at {job.company}\n"
                 f"relevant: {job.relevant.name}\n"

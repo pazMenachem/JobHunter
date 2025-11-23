@@ -1,30 +1,13 @@
 """Page navigation for handling URLs and pagination using Playwright."""
 
 import logging
-import re
 from typing import Optional
 from playwright.sync_api import Page, Locator
 from src.config import scraping_settings
 
-# Constants for button detection
-QUICK_SELECTORS = [
-    "a[aria-label='Next']",
-    "a[aria-label='next']",
-    ".next-page",
-    ".pagination .next",
-    "[data-testid='pagination-next']",
-    "button[aria-label='Next']",
-    ".pagination a:last-child"
-]
-
-TEXT_SELECTORS = [
-    "button:has-text('next')",
-    "a:has-text('next')",
-    "button:has-text('›')",
-    "a:has-text('›')",
-    "[aria-label*='next' i]",
-    "[aria-label*='Next' i]"
-]
+# Next button keywords - focus on explicit "next" indicators
+NEXT_KEYWORDS = ['next', 'forward']
+ARROW_SYMBOLS = ['›', '→', '>']
 
 
 class PageNavigator:
@@ -55,7 +38,11 @@ class PageNavigator:
             if not self._check_page_limit():
                 return False
             
+            # Scroll to bottom to ensure pagination buttons are loaded
+            self._scroll_to_bottom()
+            
             next_button = self._find_next_page_element()
+
             if next_button is None:
                 self.logger.info("No next page found")
                 return False
@@ -86,27 +73,90 @@ class PageNavigator:
             return False
         return True
     
+    def _scroll_to_bottom(self) -> None:
+        """Scroll to bottom of page to ensure pagination elements are loaded."""
+        try:
+            # Scroll to bottom
+            self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            self.page.wait_for_timeout(1000)  # Wait for any lazy-loaded content
+            
+            # Try one more scroll in case content loaded
+            self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            self.page.wait_for_timeout(500)
+        except Exception as e:
+            self.logger.debug(f"Error scrolling to bottom: {e}")
+    
     def _find_next_page_element(self) -> Optional[Locator]:
-        """Find next page button with flexible text matching."""
+        """Find next page button by checking for 'next' indicators in any attribute or text."""
+        all_elements = self.page.locator("a, button").all()
         
-        # Try different detection methods
-        methods = [
-            # Role-based (most reliable)
-            lambda: self.page.get_by_role("button", name=re.compile("next|›|→", re.IGNORECASE)).first,
-            lambda: self.page.get_by_role("link", name=re.compile("next|›|→", re.IGNORECASE)).first,
-            # Text selectors
-            *[lambda s=sel: self.page.locator(s).first for sel in TEXT_SELECTORS],
-            # CSS selectors
-            *[lambda s=sel: self.page.locator(s).first for sel in QUICK_SELECTORS]
-        ]
-        
-        for method in methods:
+        for element in all_elements:
             try:
-                element = method()
-                if element.count() > 0 and element.is_visible():
+                if not element.is_visible():
+                    continue
+                
+                if self._is_next_button(element):
                     return element
-            except:
+                    
+            except Exception:
                 continue
         
         self.logger.warning("No next page element found")
         return None
+    
+    def _is_next_button(self, element: Locator) -> bool:
+        """Check if element is a 'next' button by examining all attributes and text.
+        
+        Args:
+            element: Locator to check
+            
+        Returns:
+            True if element contains 'next' indicators, False otherwise
+        """
+        try:
+            # Extract all relevant data
+            class_attr = (element.get_attribute("class") or "").lower()
+            title = (element.get_attribute("title") or "").lower()
+            aria_label = (element.get_attribute("aria-label") or "").lower()
+            href = (element.get_attribute("href") or "").lower()
+            text = element.inner_text().lower()
+            
+            # Get all data-* attributes
+            data_attrs = self._get_data_attributes(element)
+            data_values = " ".join(data_attrs.values())
+            
+            # Combine all searchable content
+            all_content = f"{class_attr} {title} {aria_label} {href} {text} {data_values}"
+            
+            # Check for NEXT_KEYWORDS or ARROW_SYMBOLS
+            for keyword in NEXT_KEYWORDS + ARROW_SYMBOLS:
+                if keyword in all_content:
+                    self.logger.info(f"Found next button with keyword '{keyword}': text='{text[:30]}', href='{href[:50]}'")
+                    return True
+            
+            return False
+            
+        except Exception as e:
+            self.logger.debug(f"Error checking element: {e}")
+            return False
+    
+    def _get_data_attributes(self, element: Locator) -> dict:
+        """Extract all data-* attributes from element.
+        
+        Args:
+            element: Locator to extract data attributes from
+            
+        Returns:
+            Dictionary of data-* attribute names and values
+        """
+        data_attrs = {}
+        try:
+            attrs = element.evaluate("el => Array.from(el.attributes).map(a => a.name)")
+            for attr_name in attrs:
+                if attr_name.startswith("data-"):
+                    value = element.get_attribute(attr_name) or ""
+                    data_attrs[attr_name] = value.lower()
+        except Exception:
+            pass
+        return data_attrs
+    

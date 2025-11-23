@@ -34,9 +34,12 @@ class JobFilter:
         if not jobs or not run_summary:
             raise RuntimeError("No jobs provided for FILTERING")
         
+        # Store ALL jobs that were analyzed (to avoid re-analyzing)
+        run_summary.jobs = jobs
+        
+        # Filter for relevant jobs only (for notification)
         relevant_jobs = [job for job in jobs if self._should_include_job(job.relevant, filter_level)]
-
-        run_summary.jobs = relevant_jobs
+        run_summary.relevant_jobs = relevant_jobs
         run_summary.filtered_count = len(relevant_jobs)
     
     def _should_include_job(

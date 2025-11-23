@@ -18,12 +18,18 @@ def _setup_logging() -> None:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = os.path.join(logs_dir, f"job_hunter_{timestamp}.log")
     
-    # Create handlers
-    handlers = [logging.StreamHandler(sys.stdout)]
+    # Create handlers with UTF-8 encoding
+    handlers = []
+    
+    # Console handler with UTF-8 encoding
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setStream(open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1))
+    handlers.append(console_handler)
     
     # Only add file handler if the log file can be created
     try:
-        handlers.append(logging.FileHandler(log_file))
+        file_handler = logging.FileHandler(log_file, encoding='utf-8')
+        handlers.append(file_handler)
     except (OSError, IOError) as e:
         print(f"Could not create log file {log_file}: {e}")
     

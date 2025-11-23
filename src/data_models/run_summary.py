@@ -18,6 +18,7 @@ class RunSummary:
         notes: Optional general notes (e.g., warnings, info messages)
     """
     jobs: List[JobData] = None
+    relevant_jobs: List[JobData] = None
     total_found: int = 0
     filtered_count: int = 0
     deferred_count: int = 0

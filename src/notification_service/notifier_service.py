@@ -44,7 +44,7 @@ class NotifierService:
             provider: The notification provider to send to
             message: SegmentedMessage object with header and message_parts
         """
-        self.logger.info(f"Sending notification to {provider.__class__.__name__}")
+        self.logger.info(f"Sending notification using {provider.__class__.__name__}")
 
         try:
             if message.header:

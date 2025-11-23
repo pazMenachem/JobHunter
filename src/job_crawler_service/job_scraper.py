@@ -23,8 +23,6 @@ JOB_TITLE_SELECTORS = [
     "a[href*='career']",  # Links containing 'career' in href
     "a[href*='job']",  # Links containing 'job' in href
     "a[href*='opening']",  # Links containing 'opening' in href
-    "a[href*='vacancy']",  # Links containing 'vacancy' in href
-    "a[href*='opportunity']",  # Links containing 'opportunity' in href
     "a[href*='role']",  # Links containing 'role' in href
 ]
 
@@ -40,7 +38,7 @@ class JobScraper:
         """
         self.page = page
         self.logger = get_logger("job_scraper")
-        self.jobs_counter = 1
+        self.jobs_counter = 0
     
     def scrape_jobs(self) -> List[JobData]:
         """
@@ -57,35 +55,22 @@ class JobScraper:
             self.page.wait_for_load_state("networkidle")
             
             # Smart scroll - detects and scrolls correct container
-            self._scroll_page()
+            self._scroll_full_page()
             
             # Find and filter elements
             job_elements = self._find_job_elements()
+
+            # Filter job elements to only include those that match the keywords
             filtered_job_elements = self._filter_job_elements(job_elements)
             
+            # Extract job data from filtered job elements into JobData objects
             for element in filtered_job_elements:
-                result.append(self._extract_job_data(element, self.jobs_counter))
-                self.jobs_counter += 1
+                result.append(self._extract_job_data(element))
 
         except Exception as e:
             self.logger.error(f"Error finding jobs: {e}")
         
         return result
-
-    def _scroll_page(self) -> None:
-        """Smart scroll - handles both full page and container scrolling."""
-        # Try to find common scrollable containers first
-        scrolled = False
-        for selector in SCROLLABLE_CONTAINERS:
-            container = self.page.locator(selector).first
-            if container.count() > 0:
-                self._scroll_container(container)
-                scrolled = True
-                break
-        
-        # Fallback: scroll entire page
-        if not scrolled:
-            self._scroll_full_page()
 
     def _scroll_container(self, container: Locator) -> None:
         """Scroll a specific container element."""
@@ -171,26 +156,28 @@ class JobScraper:
         for element in job_elements:
             try:
                 text = element.inner_text()
-                if self._matches_keywords(text, scraping_settings.keywords) and not self._matches_keywords(text, scraping_settings.excluded_keywords):
+                if self._matches_keywords(text, scraping_settings.keywords) and \
+                not self._matches_keywords(text, scraping_settings.excluded_keywords):
                     filtered.append(element)
             except Exception:
                 continue
         self.logger.info(f"{len(filtered)} / {len(job_elements)} jobs titles are relevant")
         return filtered
 
-    def _extract_job_data(self, element: Locator, index: int) -> JobData:
+    def _extract_job_data(self, element: Locator) -> JobData:
         """
         Extract job data from Playwright element.
         
         Args:
             element: Locator to extract job data from.
-            index: Job index for unique ID.
             
         Returns:
-            JobData object.
+            JobData object with auto-incremented unique ID.
         """
+        self.jobs_counter += 1
+
         return JobData(
-            id=f"{index}",
+            id=f"{self.jobs_counter}",
             title=element.inner_text(),
             url=element.evaluate("el => el.href"),
             company=self._extract_company_name(self.page.url),

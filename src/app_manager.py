@@ -62,19 +62,19 @@ class JobHunterOrchestrator:
             self._crawl_jobs()
             
             # Step 2: Filter duplicate jobs
-            # self._filter_duplicate_jobs()
+            self._filter_duplicate_jobs()
 
             # Step 3: Update job status using LLM
-            # self._update_job_status()
+            self._send_to_LLM()
             
             # Step 4: Filter jobs based on relevance
-            # self._filter_jobs_by_relevance()
+            self._filter_jobs_by_relevance()
             
             # Step 5: Send summary to user
-            # self._send_summary(run_summary=self.run_summary)
+            self._send_summary(run_summary=self.run_summary)
             
             # Step 6: Mark jobs as sent
-            # self._mark_jobs_as_sent()
+            self._mark_jobs_as_sent()
         
             self.logger.info("\n\t\t********* Application finished successfully *********\n")
             
@@ -83,6 +83,9 @@ class JobHunterOrchestrator:
                              \n\t\t********* Application finished successfully *********
                              \n\t\t\t********* No new jobs found *********
                              \n""")
+            # Mark all analyzed jobs as sent to avoid re-analyzing with LLM
+            if self.run_summary.jobs:
+                self._mark_jobs_as_sent()
             self._send_component_error(error=e)
             
         except (JobCrawlerException, LLMException, NotifierException) as e:
@@ -116,10 +119,10 @@ class JobHunterOrchestrator:
         
         self.logger.info(f"Filtered {initial_count - len(self.jobs)} duplicate jobs, {len(self.jobs)} new jobs remaining")
     
-    def _update_job_status(self) -> None:
+    def _send_to_LLM(self) -> None:
         """Update job status using LLM with batching."""
         self.logger.info(f"\n\n\t\t *** Starting Phase 3 - updating job status using LLM ***\n")
-        self.llm_service.update_job_status(jobs=self.jobs)
+        self.llm_service.sends_jobs_to_llm(jobs=self.jobs)
         
     def _filter_jobs_by_relevance(self) -> None:
         """Filter jobs based on relevance."""
@@ -133,7 +136,7 @@ class JobHunterOrchestrator:
         """Send summary to user with deferred jobs and notes."""
         self.logger.info(f"\n\n\t\t *** Starting Phase 5 - sending summary to user ***\n")
 
-        if not run_summary.jobs:
+        if not run_summary.relevant_jobs:
             raise NoNewJobsException()
         
         for provider in self.notifier_service.providers:
@@ -147,9 +150,13 @@ class JobHunterOrchestrator:
                 )
     
     def _mark_jobs_as_sent(self) -> None:
-        """Mark jobs as sent in storage."""
+        """Mark ALL analyzed jobs as sent to avoid re-analyzing with LLM."""
         self.logger.info(f"\n\n\t\t *** Starting Phase 6 - marking jobs as sent ***\n")
-        self.job_storage_service.mark_jobs_as_sent(self.run_summary.jobs)
+        if self.run_summary.jobs:
+            self.job_storage_service.mark_jobs_as_sent(self.run_summary.jobs)
+            self.logger.info(f"Marked {len(self.run_summary.jobs)} jobs as sent (analyzed)")
+        else:
+            self.logger.warning("No jobs to mark as sent")
     
     def _send_component_error(self, *, error: Exception) -> None:
         """Send component error to user."""

@@ -30,7 +30,7 @@ class LLMService:
         
         self.logger.info("LLM service initialized...")
         
-    def update_job_status(self, *, jobs: List[JobData]) -> None:
+    def sends_jobs_to_llm(self, *, jobs: List[JobData]) -> None:
         """Update job status using batched LLM analysis.
         
         Args:
